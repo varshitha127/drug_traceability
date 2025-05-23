@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}View Products - Drug Traceability System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="h3 mb-0">
+                        <i class="fas fa-pills text-primary me-2"></i>
+                        Product Inventory
+                    </h2>
+                    <p class="text-muted">Track and manage your drug inventory</p>
+                </div>
+                <a href="{% url 'AddProduct' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Add New Product
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Product List -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                {% if data %}
+                    {{ data|safe }}
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-pills fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No products found in the system</p>
+                        <a href="{% url 'AddProduct' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Add Your First Product
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+// Auto-dismiss alerts after 5 seconds
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        var alerts = document.querySelectorAll('.alert')
+        alerts.forEach(function(alert) {
+            var bsAlert = new bootstrap.Alert(alert)
+            bsAlert.close()
+        })
+    }, 5000)
+})
+</script>
+{% endblock %}
+{% endblock %}

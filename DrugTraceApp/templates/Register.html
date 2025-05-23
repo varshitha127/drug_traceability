@@ -1,0 +1,243 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Register - Drug Traceability System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-user-plus fa-3x text-primary mb-3"></i>
+                        <h2 class="h4">Create Account</h2>
+                        <p class="text-muted">Join our drug traceability system</p>
+                    </div>
+
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="POST" action="{% url 'Signup' %}" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="username" 
+                                       name="username" 
+                                       placeholder="Choose a username"
+                                       required
+                                       pattern="[a-zA-Z0-9_]{3,20}"
+                                       title="Username must be 3-20 characters long and can only contain letters, numbers, and underscores">
+                            </div>
+                            <div class="form-text">3-20 characters, letters, numbers, and underscores only</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-envelope"></i>
+                                </span>
+                                <input type="email" 
+                                       class="form-control" 
+                                       id="email" 
+                                       name="email" 
+                                       placeholder="Enter your email"
+                                       required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-lock"></i>
+                                </span>
+                                <input type="password" 
+                                       class="form-control" 
+                                       id="password" 
+                                       name="password" 
+                                       placeholder="Enter your password"
+                                       required>
+                                <button class="btn btn-outline-secondary" 
+                                        type="button" 
+                                        id="togglePassword"
+                                        data-bs-toggle="tooltip"
+                                        title="Show/Hide Password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="confirm_password" class="form-label">Confirm Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-lock"></i>
+                                </span>
+                                <input type="password" 
+                                       class="form-control" 
+                                       id="confirm_password" 
+                                       name="confirm_password" 
+                                       placeholder="Confirm your password"
+                                       required>
+                                <button class="btn btn-outline-secondary" 
+                                        type="button" 
+                                        id="toggleConfirmPassword"
+                                        data-bs-toggle="tooltip"
+                                        title="Show/Hide Password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input type="checkbox" 
+                                       class="form-check-input" 
+                                       id="terms" 
+                                       required>
+                                <label class="form-check-label" for="terms">
+                                    I agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Terms and Conditions</a>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-user-plus me-2"></i>Create Account
+                            </button>
+                            <a href="{% url 'Login' %}" class="btn btn-outline-secondary btn-lg">
+                                <i class="fas fa-sign-in-alt me-2"></i>Already have an account? Login
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Terms and Conditions Modal -->
+<div class="modal fade" id="termsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Terms and Conditions</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6>1. Account Registration</h6>
+                <p>By registering for an account, you agree to provide accurate and complete information.</p>
+                
+                <h6>2. Data Privacy</h6>
+                <p>We are committed to protecting your privacy and handling your data in accordance with applicable laws.</p>
+                
+                <h6>3. System Usage</h6>
+                <p>You agree to use the system responsibly and in compliance with all applicable laws and regulations.</p>
+                
+                <h6>4. Security</h6>
+                <p>You are responsible for maintaining the confidentiality of your account credentials.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+// Form validation
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            
+            // Check if passwords match
+            var password = document.getElementById('password')
+            var confirmPassword = document.getElementById('confirm_password')
+            if (password.value !== confirmPassword.value) {
+                confirmPassword.setCustomValidity('Passwords do not match')
+                event.preventDefault()
+                event.stopPropagation()
+            } else {
+                confirmPassword.setCustomValidity('')
+            }
+            
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+
+// Password visibility toggle
+document.addEventListener('DOMContentLoaded', function() {
+    // Function to toggle password visibility
+    function togglePasswordVisibility(inputId, buttonId) {
+        const passwordInput = document.getElementById(inputId);
+        const toggleButton = document.getElementById(buttonId);
+        const icon = toggleButton.querySelector('i');
+
+        toggleButton.addEventListener('click', function() {
+            // Toggle password visibility
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+    }
+
+    // Initialize password toggles
+    togglePasswordVisibility('password', 'togglePassword');
+    togglePasswordVisibility('confirm_password', 'toggleConfirmPassword');
+
+    // Password validation
+    const password = document.getElementById('password');
+    const confirmPassword = document.getElementById('confirm_password');
+
+    function validatePassword() {
+        if (password.value !== confirmPassword.value) {
+            confirmPassword.setCustomValidity("Passwords don't match");
+        } else {
+            confirmPassword.setCustomValidity('');
+        }
+    }
+
+    password.addEventListener('change', validatePassword);
+    confirmPassword.addEventListener('keyup', validatePassword);
+
+    // Auto-dismiss alerts
+    setTimeout(function() {
+        var alerts = document.querySelectorAll('.alert')
+        alerts.forEach(function(alert) {
+            var bsAlert = new bootstrap.Alert(alert)
+            bsAlert.close()
+        })
+    }, 5000)
+});
+</script>
+{% endblock %}
+{% endblock %}

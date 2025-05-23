@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Update Product - Drug Traceability System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-edit fa-3x text-primary mb-3"></i>
+                        <h2 class="h4">Update Product Details</h2>
+                        <p class="text-muted">Modify drug information for blockchain tracking</p>
+                    </div>
+
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="POST" action="{% url 'UpdateTracingAction' product.id %}" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="drug_name" class="form-label">Drug Name</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-capsules"></i>
+                                    </span>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="drug_name" 
+                                           name="drug_name" 
+                                           value="{{ product.drug_name }}"
+                                           placeholder="Enter drug name"
+                                           required>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="manufacturer" class="form-label">Manufacturer</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-industry"></i>
+                                    </span>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="manufacturer" 
+                                           name="manufacturer" 
+                                           value="{{ product.manufacturer }}"
+                                           placeholder="Enter manufacturer name"
+                                           required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="batch_number" class="form-label">Batch Number</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-barcode"></i>
+                                    </span>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="batch_number" 
+                                           name="batch_number" 
+                                           value="{{ product.batch_number }}"
+                                           placeholder="Enter batch number"
+                                           required>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="manufacturing_date" class="form-label">Manufacturing Date</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-calendar"></i>
+                                    </span>
+                                    <input type="date" 
+                                           class="form-control" 
+                                           id="manufacturing_date" 
+                                           name="manufacturing_date" 
+                                           value="{{ product.manufacturing_date|date:'Y-m-d' }}"
+                                           required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="expiry_date" class="form-label">Expiry Date</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-calendar-times"></i>
+                                    </span>
+                                    <input type="date" 
+                                           class="form-control" 
+                                           id="expiry_date" 
+                                           name="expiry_date" 
+                                           value="{{ product.expiry_date|date:'Y-m-d' }}"
+                                           required>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="quantity" class="form-label">Quantity</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-boxes"></i>
+                                    </span>
+                                    <input type="number" 
+                                           class="form-control" 
+                                           id="quantity" 
+                                           name="quantity" 
+                                           value="{{ product.quantity }}"
+                                           placeholder="Enter quantity"
+                                           required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                                <textarea class="form-control" 
+                                          id="description" 
+                                          name="description" 
+                                          rows="3" 
+                                          placeholder="Enter product description"
+                                          required>{{ product.description }}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="product_image" class="form-label">Product Image</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-image"></i>
+                                </span>
+                                <input type="file" 
+                                       class="form-control" 
+                                       id="product_image" 
+                                       name="product_image" 
+                                       accept="image/*">
+                            </div>
+                            {% if product.product_image %}
+                                <div class="mt-2">
+                                    <small class="text-muted">Current image:</small>
+                                    <img src="{{ product.product_image.url }}" 
+                                         alt="{{ product.drug_name }}" 
+                                         class="img-thumbnail mt-1" 
+                                         style="max-height: 100px;">
+                                </div>
+                            {% endif %}
+                            <div class="form-text">Upload a new image to replace the current one</div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save me-2"></i>Update Product
+                            </button>
+                            <a href="{% url 'ViewTracing' %}" class="btn btn-outline-secondary btn-lg">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Products
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+// Form validation
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+
+// Date validation
+document.getElementById('expiry_date').addEventListener('change', function() {
+    var manufacturingDate = new Date(document.getElementById('manufacturing_date').value);
+    var expiryDate = new Date(this.value);
+    
+    if (expiryDate <= manufacturingDate) {
+        this.setCustomValidity('Expiry date must be after manufacturing date');
+    } else {
+        this.setCustomValidity('');
+    }
+});
+
+// Auto-dismiss alerts after 5 seconds
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        var alerts = document.querySelectorAll('.alert')
+        alerts.forEach(function(alert) {
+            var bsAlert = new bootstrap.Alert(alert)
+            bsAlert.close()
+        })
+    }, 5000)
+})
+</script>
+{% endblock %}
+{% endblock %}

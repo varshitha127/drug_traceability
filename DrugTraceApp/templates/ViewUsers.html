@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}User Management - Drug Traceability System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="h3 mb-0">
+                        <i class="fas fa-users text-primary me-2"></i>
+                        User Management
+                    </h2>
+                    <p class="text-muted">View and manage system users</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User List -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                {% if data %}
+                    {{ data|safe }}
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No users found in the system</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+// Auto-dismiss alerts after 5 seconds
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        var alerts = document.querySelectorAll('.alert')
+        alerts.forEach(function(alert) {
+            var bsAlert = new bootstrap.Alert(alert)
+            bsAlert.close()
+        })
+    }, 5000)
+})
+</script>
+{% endblock %}
+{% endblock %} 

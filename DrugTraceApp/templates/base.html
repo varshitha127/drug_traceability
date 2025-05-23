@@ -1,0 +1,670 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Drug Traceability System - Secure blockchain-based drug supply chain management">
+    <title>{% block title %}Drug Traceability System{% endblock %}</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --secondary-color: #6c757d;
+            --success-color: #198754;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --info-color: #0dcaf0;
+            --transition-speed: 0.3s;
+        }
+
+        [data-bs-theme="dark"] {
+            --bs-body-bg: #212529;
+            --bs-body-color: #f8f9fa;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bs-body-bg);
+            color: var(--bs-body-color);
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+            transition: background-color var(--transition-speed);
+        }
+
+        .navbar-brand {
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .navbar-brand:hover {
+            transform: scale(1.05);
+        }
+
+        .nav-link {
+            font-weight: 500;
+            position: relative;
+            padding: 0.5rem 1rem;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 50%;
+            background-color: var(--primary-color);
+            transition: all var(--transition-speed);
+            transform: translateX(-50%);
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .nav-link.active {
+            color: var(--primary-color) !important;
+        }
+
+        .nav-link.active::after {
+            width: 100%;
+        }
+
+        /* Card Styles */
+        .card {
+            border: none;
+            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,.075);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(0,0,0,.15);
+        }
+
+        /* Button Styles */
+        .btn {
+            font-weight: 500;
+            transition: all var(--transition-speed);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: -100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .btn:hover::after {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            background-color: #0b5ed7;
+            border-color: #0a58ca;
+            transform: translateY(-1px);
+        }
+
+        /* Form Styles */
+        .form-control {
+            transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(13,110,253,.25);
+        }
+
+        .input-group-text {
+            background-color: var(--bs-body-bg);
+            border-color: var(--bs-border-color);
+            transition: background-color var(--transition-speed);
+        }
+
+        /* Alert Styles */
+        .alert {
+            border: none;
+            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,.075);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-10px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Footer Styles */
+        .footer {
+            margin-top: auto;
+            padding: 1.5rem 0;
+            background-color: var(--bs-body-bg);
+            border-top: 1px solid var(--bs-border-color);
+            transition: background-color var(--transition-speed), border-color var(--transition-speed);
+        }
+
+        .footer a {
+            transition: color var(--transition-speed);
+        }
+
+        .footer a:hover {
+            color: var(--primary-color) !important;
+        }
+
+        /* Theme Toggle Button */
+        .theme-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading-spinner.active {
+            display: flex;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bs-body-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--secondary-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-color);
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+        }
+
+        /* Responsive Tables */
+        .table-responsive {
+            border-radius: 0.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,.075);
+        }
+
+        /* Tooltip Customization */
+        .tooltip {
+            font-size: 0.875rem;
+        }
+
+        .tooltip-inner {
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+        }
+
+        /* Developer Info Styles */
+        .developer-info {
+            position: relative;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background: linear-gradient(145deg, var(--bs-body-bg), var(--bs-body-bg));
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .developer-info:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .developer-info::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--info-color));
+            border-radius: 3px 3px 0 0;
+        }
+
+        .developer-info .developer-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--bs-body-color);
+            margin-bottom: 0.5rem;
+            display: inline-block;
+            position: relative;
+        }
+
+        .developer-info .developer-name::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary-color), transparent);
+        }
+
+        .developer-info .badge {
+            font-weight: 500;
+            padding: 0.5em 0.8em;
+            margin: 0.2rem;
+            border-radius: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .developer-info .badge:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+        }
+
+        .developer-info .social-links {
+            margin-top: 1rem;
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .developer-info .social-links .btn {
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .developer-info .social-links .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .developer-info .social-links .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255,255,255,0.2),
+                transparent
+            );
+            transition: 0.5s;
+        }
+
+        .developer-info .social-links .btn:hover::before {
+            left: 100%;
+        }
+
+        .developer-info .social-links .btn i {
+            transition: transform 0.3s ease;
+        }
+
+        .developer-info .social-links .btn:hover i {
+            transform: scale(1.2);
+        }
+
+        /* Footer Enhancement */
+        .footer {
+            position: relative;
+            background: linear-gradient(
+                to bottom,
+                var(--bs-body-bg),
+                var(--bs-body-bg)
+            );
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                var(--bs-border-color),
+                transparent
+            );
+        }
+
+        @media (max-width: 768px) {
+            .developer-info {
+                margin: 1rem 0;
+            }
+            
+            .developer-info .social-links {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .developer-info .social-links .btn {
+                width: 100%;
+                max-width: 200px;
+                margin: 0.25rem 0;
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Loading Spinner -->
+    <div class="loading-spinner">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-body-tertiary sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'ViewTracing' %}" data-aos="fade-right">
+                <i class="fas fa-pills text-primary me-2"></i>
+                Drug Traceability
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                {% if user.is_authenticated %}
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item" data-aos="fade-down" data-aos-delay="100">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'ViewTracing' %}active{% endif %}" 
+                               href="{% url 'ViewTracing' %}">
+                                <i class="fas fa-list me-1"></i>Products
+                            </a>
+                        </li>
+                        <li class="nav-item" data-aos="fade-down" data-aos-delay="200">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'AddProduct' %}active{% endif %}" 
+                               href="{% url 'AddProduct' %}">
+                                <i class="fas fa-plus me-1"></i>Add Product
+                            </a>
+                        </li>
+                        {% if user.is_staff %}
+                        <li class="nav-item" data-aos="fade-down" data-aos-delay="300">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'ViewUsers' %}active{% endif %}" 
+                               href="{% url 'ViewUsers' %}">
+                                <i class="fas fa-users me-1"></i>Users
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                    <div class="d-flex align-items-center" data-aos="fade-left">
+                        <div class="dropdown me-3">
+                            <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user me-1"></i>{{ user.username }}
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-user-cog me-2"></i>Profile</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="{% url 'index' %}">
+                                    <i class="fas fa-sign-out-alt me-2"></i>Logout
+                                </a></li>
+                            </ul>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow-1">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-4 text-center text-md-start">
+                    <p class="mb-0 text-muted">
+                        &copy; {% now "Y" %} Drug Traceability System. All rights reserved.
+                    </p>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div class="developer-info" data-aos="fade-up" data-aos-delay="100">
+                        <div class="developer-name">
+                            <i class="fas fa-code me-2 text-primary"></i>
+                            L. Varshitha
+                        </div>
+                        <div class="badges mb-2">
+                            <span class="badge bg-primary">
+                                <i class="fas fa-link me-1"></i>Blockchain Developer
+                            </span>
+                            <span class="badge bg-info">
+                                <i class="fas fa-laptop-code me-1"></i>Full Stack Developer
+                            </span>
+                        </div>
+                        <div class="social-links">
+                            <a href="https://github.com/varshitha127" 
+                               class="btn btn-outline-dark" 
+                               target="_blank" 
+                               data-bs-toggle="tooltip" 
+                               title="View GitHub Profile">
+                                <i class="fab fa-github me-2"></i>GitHub
+                            </a>
+                            <a href="https://www.linkedin.com/in/varshithareddy-lakkireddy-1b1326290" 
+                               class="btn btn-outline-primary" 
+                               target="_blank"
+                               data-bs-toggle="tooltip" 
+                               title="Connect on LinkedIn">
+                                <i class="fab fa-linkedin me-2"></i>LinkedIn
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-center text-md-end">
+                    <p class="mb-1 text-muted">
+                        <i class="fas fa-link me-1"></i>Powered by Blockchain Technology
+                    </p>
+                    <p class="mb-0 small text-muted">
+                        <i class="fas fa-shield-alt me-1"></i>Secure & Transparent Supply Chain
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Theme Toggle Button -->
+    <button class="theme-toggle" id="themeToggle" data-bs-toggle="tooltip" title="Toggle Dark Mode">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- AOS Animation Library -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 800,
+            once: true
+        });
+
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+        const icon = themeToggle.querySelector('i');
+
+        // Check for saved theme preference
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            html.setAttribute('data-bs-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-bs-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            html.setAttribute('data-bs-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+            
+            showToast(`Switched to ${newTheme} mode`, 'success');
+        });
+
+        function updateThemeIcon(theme) {
+            icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+        }
+
+        // Toast Notification System
+        function showToast(message, type = 'info') {
+            const toastContainer = document.querySelector('.toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-white bg-${type} border-0`;
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'assertive');
+            toast.setAttribute('aria-atomic', 'true');
+            
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            
+            toastContainer.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast, { autohide: true, delay: 3000 });
+            bsToast.show();
+            
+            toast.addEventListener('hidden.bs.toast', () => {
+                toast.remove();
+            });
+        }
+
+        // Loading Spinner
+        function showLoading() {
+            document.querySelector('.loading-spinner').classList.add('active');
+        }
+
+        function hideLoading() {
+            document.querySelector('.loading-spinner').classList.remove('active');
+        }
+
+        // Form Submission Handler
+        document.addEventListener('submit', function(e) {
+            if (e.target.matches('form')) {
+                showLoading();
+            }
+        });
+
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+
+        // Initialize popovers
+        var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+        var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+            return new bootstrap.Popover(popoverTriggerEl)
+        });
+
+        // Add smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add active class to current nav item
+        document.querySelectorAll('.nav-link').forEach(link => {
+            if (link.getAttribute('href') === window.location.pathname) {
+                link.classList.add('active');
+            }
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html> 

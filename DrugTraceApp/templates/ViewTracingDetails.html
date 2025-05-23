@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.drug_name }} - Drug Traceability System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-lg">
+                <div class="card-body p-5">
+                    <!-- Header Section -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h2 class="h3 mb-1">
+                                <i class="fas fa-pills text-primary me-2"></i>
+                                {{ product.drug_name }}
+                            </h2>
+                            <p class="text-muted mb-0">Product Details and Blockchain Information</p>
+                        </div>
+                        <div class="btn-group">
+                            <a href="{% url 'UpdateTracing' product.id %}" class="btn btn-outline-primary">
+                                <i class="fas fa-edit me-2"></i>Edit
+                            </a>
+                            <a href="{% url 'ViewTracing' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Back
+                            </a>
+                        </div>
+                    </div>
+
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <div class="row">
+                        <!-- Product Image Section -->
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100">
+                                <div class="card-body text-center">
+                                    {% if product.product_image %}
+                                        <img src="{{ product.product_image.url }}" 
+                                             alt="{{ product.drug_name }}" 
+                                             class="img-fluid rounded mb-3" 
+                                             style="max-height: 300px; object-fit: contain;">
+                                    {% else %}
+                                        <div class="bg-light rounded p-5 mb-3">
+                                            <i class="fas fa-image fa-4x text-muted"></i>
+                                        </div>
+                                    {% endif %}
+                                    <h5 class="card-title">Product Image</h5>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Product Details Section -->
+                        <div class="col-md-8">
+                            <div class="card mb-4">
+                                <div class="card-header bg-light">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-info-circle text-primary me-2"></i>
+                                        Product Information
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label text-muted">Manufacturer</label>
+                                            <p class="mb-0">{{ product.manufacturer }}</p>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label text-muted">Batch Number</label>
+                                            <p class="mb-0">
+                                                <span class="badge bg-light text-dark">
+                                                    {{ product.batch_number }}
+                                                </span>
+                                            </p>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label text-muted">Manufacturing Date</label>
+                                            <p class="mb-0">{{ product.manufacturing_date|date:"d M Y" }}</p>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label text-muted">Expiry Date</label>
+                                            <p class="mb-0">
+                                                {% if product.is_expired %}
+                                                    <span class="badge bg-danger">Expired</span>
+                                                {% else %}
+                                                    {{ product.expiry_date|date:"d M Y" }}
+                                                {% endif %}
+                                            </p>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label text-muted">Quantity</label>
+                                            <p class="mb-0">
+                                                <span class="badge {% if product.quantity < 10 %}bg-warning{% else %}bg-success{% endif %}">
+                                                    {{ product.quantity }} units
+                                                </span>
+                                            </p>
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label text-muted">Description</label>
+                                            <p class="mb-0">{{ product.description }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Blockchain Information Section -->
+                            <div class="card">
+                                <div class="card-header bg-light">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-link text-primary me-2"></i>
+                                        Blockchain Information
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label text-muted">Blockchain Hash</label>
+                                            <p class="mb-0">
+                                                <code class="bg-light px-2 py-1 rounded">
+                                                    {{ product.blockchain_hash|default:"Not yet recorded" }}
+                                                </code>
+                                            </p>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label text-muted">Last Updated</label>
+                                            <p class="mb-0">{{ product.updated_at|date:"d M Y H:i" }}</p>
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label text-muted">Transaction Status</label>
+                                            <p class="mb-0">
+                                                {% if product.blockchain_hash %}
+                                                    <span class="badge bg-success">
+                                                        <i class="fas fa-check-circle me-1"></i>
+                                                        Verified on Blockchain
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge bg-warning">
+                                                        <i class="fas fa-clock me-1"></i>
+                                                        Pending Blockchain Record
+                                                    </span>
+                                                {% endif %}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+// Auto-dismiss alerts after 5 seconds
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        var alerts = document.querySelectorAll('.alert')
+        alerts.forEach(function(alert) {
+            var bsAlert = new bootstrap.Alert(alert)
+            bsAlert.close()
+        })
+    }, 5000)
+})
+</script>
+{% endblock %}
+{% endblock %} 
