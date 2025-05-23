@@ -9,7 +9,7 @@ DEBUG = False
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'your-secret-key-here')
 
 # Update ALLOWED_HOSTS with your domain
-ALLOWED_HOSTS = ['your-domain.com', 'www.your-domain.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['varshitha127.pythonanywhere.com', 'www.varshitha127.pythonanywhere.com']
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
