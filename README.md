@@ -96,4 +96,60 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 Varshitha - [@varshitha127](https://github.com/varshitha127)
 
-Project Link: [https://github.com/varshitha127/drug_traceability](https://github.com/varshitha127/drug_traceability) 
+Project Link: [https://github.com/varshitha127/drug_traceability](https://github.com/varshitha127/drug_traceability)
+
+## Project Structure
+
+```
+drug_traceability/
+│
+├── DrugTraceApp/                  # Main Django application
+│   ├── services/                  # Blockchain and business logic services
+│   ├── templates/                 # HTML templates
+│   │   ├── admin/                # Admin interface templates
+│   │   ├── auth/                 # Authentication templates
+│   │   ├── manufacturer/         # Manufacturer role templates
+│   │   ├── distributor/          # Distributor role templates
+│   │   ├── retailer/            # Retailer role templates
+│   │   └── consumer/            # Consumer role templates
+│   │
+│   ├── static/                   # Static files (CSS, JS, Images)
+│   │   ├── css/                 # Stylesheets
+│   │   ├── js/                  # JavaScript files
+│   │   └── images/              # Image assets
+│   │
+│   ├── migrations/              # Database migrations
+│   ├── __init__.py
+│   ├── admin.py                 # Admin site configuration
+│   ├── apps.py                  # App configuration
+│   ├── forms.py                 # Form definitions
+│   ├── models.py                # Database models
+│   ├── settings.py              # Development settings
+│   ├── settings_prod.py         # Production settings
+│   ├── urls.py                  # URL routing
+│   ├── views.py                 # View functions
+│   ├── wsgi.py                  # WSGI configuration
+│   └── asgi.py                  # ASGI configuration
+│
+├── media/                       # User-uploaded media files
+├── staticfiles/                 # Collected static files
+├── venv/                        # Virtual environment
+│
+├── Drug.sol                     # Smart contract source code
+├── Drug.json                    # Compiled smart contract
+├── manage.py                    # Django management script
+├── requirements.txt             # Python dependencies
+├── Procfile                     # Deployment configuration
+├── .gitignore                   # Git ignore rules
+└── README.md                    # Project documentation
+```
+
+### Key Components
+
+- **Smart Contracts**: `Drug.sol` contains the Ethereum smart contract for drug tracking
+- **Django App**: `DrugTraceApp/` contains the main web application
+- **Templates**: Role-specific templates for different stakeholders
+- **Static Files**: CSS, JavaScript, and images for the web interface
+- **Services**: Blockchain integration and business logic
+- **Media**: Storage for user-uploaded files
+- **Configuration**: Settings for both development and production environments 
