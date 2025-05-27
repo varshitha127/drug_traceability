@@ -6,10 +6,10 @@ from pathlib import Path
 DEBUG = False
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'your-production-secret-key-here')
+SECRET_KEY = '23cCGBknmI36jcex1qLoRS4VxCEtAozMjHOFtWIMZyg='
 
 # Update ALLOWED_HOSTS with your domain
-ALLOWED_HOSTS = ['your-domain.com', 'www.your-domain.com']
+ALLOWED_HOSTS = ['22e47c6b1e833b107be7ed471463aaf4', 'www.22e47c6b1e833b107be7ed471463aaf4']
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
