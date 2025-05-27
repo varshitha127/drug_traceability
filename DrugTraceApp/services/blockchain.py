@@ -10,47 +10,163 @@ import hashlib
 logger = logging.getLogger(__name__)
 
 class BlockchainService:
-    """Service class for handling blockchain operations"""
-    
+    _instance = None
+    _initialized = False
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(BlockchainService, cls).__new__(cls)
+        return cls._instance
+
     def __init__(self):
-        self.web3 = None
-        self.contract = None
-        self._initialize_web3()
-    
-    def _initialize_web3(self) -> None:
-        """Initialize Web3 connection and contract"""
+        if not self._initialized:
+            self._initialized = True
+            self._web3 = None
+            self._contract = None
+            self._contract_address = None
+            self._contract_abi = None
+            self._initialize_blockchain()
+
+    def _initialize_blockchain(self):
+        """Initialize blockchain connection and contract"""
         try:
-            # Get blockchain configuration from environment variables
-            blockchain_url = os.getenv('BLOCKCHAIN_URL', 'http://127.0.0.1:9545')
-            contract_address = os.getenv('CONTRACT_ADDRESS')
-            contract_abi_path = os.path.join(settings.BASE_DIR, 'contracts', 'Drug.json')
-            
-            if not all([blockchain_url, contract_address, contract_abi_path]):
-                raise ValueError("Missing blockchain configuration")
-            
+            # Get configuration from settings
+            blockchain_address = getattr(settings, 'BLOCKCHAIN_ADDRESS', 'http://127.0.0.1:9545')
+            contract_path = getattr(settings, 'CONTRACT_PATH', 'Drug.json')
+            contract_address = getattr(settings, 'CONTRACT_ADDRESS', '0x152C98B8d6B3b6B983ba6bE52A1b0AcEf132e86D')
+
             # Initialize Web3
-            self.web3 = Web3(HTTPProvider(blockchain_url))
-            if not self.web3.is_connected():
-                raise ConnectionError("Failed to connect to blockchain network")
-            
-            # Load contract ABI
-            with open(contract_abi_path) as f:
-                contract_json = json.load(f)
-                contract_abi = contract_json['abi']
-            
-            # Initialize contract
-            self.contract = self.web3.eth.contract(
-                address=contract_address,
-                abi=contract_abi
-            )
-            
+            self._web3 = Web3(HTTPProvider(blockchain_address))
+            if not self._web3.is_connected():
+                raise ConnectionError("Failed to connect to blockchain node")
+
             # Set default account
-            self.web3.eth.default_account = os.getenv('BLOCKCHAIN_ACCOUNT')
+            if self._web3.eth.accounts:
+                self._web3.eth.default_account = self._web3.eth.accounts[0]
+
+            # Load contract
+            try:
+                with open(contract_path) as file:
+                    contract_json = json.load(file)
+                    self._contract_abi = contract_json['abi']
+                self._contract_address = contract_address
+                self._contract = self._web3.eth.contract(
+                    address=self._contract_address,
+                    abi=self._contract_abi
+                )
+            except Exception as e:
+                logger.error(f"Error loading contract: {str(e)}")
+                raise
+
+        except Exception as e:
+            logger.error(f"Blockchain initialization error: {str(e)}")
+            raise
+
+    @property
+    def web3(self) -> Web3:
+        """Get Web3 instance"""
+        if not self._web3:
+            self._initialize_blockchain()
+        return self._web3
+
+    @property
+    def contract(self):
+        """Get contract instance"""
+        if not self._contract:
+            self._initialize_blockchain()
+        return self._contract
+
+    def get_user_data(self) -> str:
+        """Get user data from blockchain"""
+        try:
+            return self.contract.functions.getUser().call()
+        except Exception as e:
+            logger.error(f"Error getting user data: {str(e)}")
+            raise
+
+    def get_tracing_data(self) -> str:
+        """Get tracing data from blockchain"""
+        try:
+            return self.contract.functions.getTracingData().call()
+        except Exception as e:
+            logger.error(f"Error getting tracing data: {str(e)}")
+            raise
+
+    def add_user_data(self, data: str) -> str:
+        """Add user data to blockchain"""
+        try:
+            tx_hash = self.contract.functions.addUser(data).transact()
+            return self.web3.eth.wait_for_transaction_receipt(tx_hash)
+        except Exception as e:
+            logger.error(f"Error adding user data: {str(e)}")
+            raise
+
+    def add_tracing_data(self, data: str) -> str:
+        """Add tracing data to blockchain"""
+        try:
+            tx_hash = self.contract.functions.setTracingData(data).transact()
+            return self.web3.eth.wait_for_transaction_receipt(tx_hash)
+        except Exception as e:
+            logger.error(f"Error adding tracing data: {str(e)}")
+            raise
+
+    def update_tracing_data(self, data: str) -> str:
+        """Update tracing data in blockchain"""
+        try:
+            tx_hash = self.contract.functions.setTracingData(data).transact()
+            return self.web3.eth.wait_for_transaction_receipt(tx_hash)
+        except Exception as e:
+            logger.error(f"Error updating tracing data: {str(e)}")
+            raise
+
+    def add_drug_trace(self, data: Dict[str, Any]) -> str:
+        """Add drug trace to blockchain"""
+        try:
+            # Convert data to string format expected by contract
+            data_str = json.dumps(data)
+            tx_hash = self.contract.functions.setTracingData(data_str).transact()
+            return self.web3.eth.wait_for_transaction_receipt(tx_hash)
+        except Exception as e:
+            logger.error(f"Error adding drug trace: {str(e)}")
+            raise
+
+    def verify_drug_trace(self, tx_hash: str, data: Dict[str, Any]) -> bool:
+        """Verify drug trace in blockchain"""
+        try:
+            # Get transaction receipt
+            receipt = self.web3.eth.get_transaction_receipt(tx_hash)
+            if not receipt:
+                return False
+
+            # Get transaction data
+            tx = self.web3.eth.get_transaction(tx_hash)
+            if not tx:
+                return False
+
+            # Verify transaction was successful
+            if receipt['status'] != 1:
+                return False
+
+            # Get stored data from blockchain
+            stored_data = self.get_drug_trace(tx_hash)
+            if not stored_data:
+                return False
+            
+            # Compare data hashes
+            current_hash = hashlib.sha256(
+                json.dumps(data, sort_keys=True).encode()
+            ).hexdigest()
+            
+            stored_hash = hashlib.sha256(
+                json.dumps(stored_data, sort_keys=True).encode()
+            ).hexdigest()
+            
+            return current_hash == stored_hash
             
         except Exception as e:
-            logger.error(f"Failed to initialize blockchain service: {str(e)}")
-            raise
-    
+            logger.error(f"Error verifying drug trace: {str(e)}")
+            return False
+
     def _get_nonce(self) -> int:
         """Get the current nonce for the default account"""
         return self.web3.eth.get_transaction_count(self.web3.eth.default_account)
@@ -75,42 +191,6 @@ class BlockchainService:
             logger.error(f"Transaction failed: {str(e)}")
             raise
     
-    def add_drug_trace(self, drug_data: Dict[str, Any]) -> str:
-        """Add drug trace to blockchain"""
-        try:
-            # Generate unique hash for the drug data
-            data_hash = hashlib.sha256(
-                json.dumps(drug_data, sort_keys=True).encode()
-            ).hexdigest()
-            
-            # Prepare transaction
-            nonce = self._get_nonce()
-            transaction = self.contract.functions.addDrugTrace(
-                data_hash,
-                json.dumps(drug_data)
-            ).build_transaction({
-                'nonce': nonce,
-                'gas': 2000000,
-                'gasPrice': self.web3.eth.gas_price
-            })
-            
-            # Sign and send transaction
-            signed_txn = self._sign_transaction(transaction)
-            tx_hash = self.web3.eth.send_raw_transaction(signed_txn.rawTransaction)
-            
-            # Wait for transaction receipt
-            receipt = self._wait_for_transaction(tx_hash)
-            
-            # Cache the transaction hash
-            cache_key = f"drug_trace_{data_hash}"
-            cache.set(cache_key, receipt['transactionHash'].hex(), timeout=3600)
-            
-            return receipt['transactionHash'].hex()
-            
-        except Exception as e:
-            logger.error(f"Failed to add drug trace: {str(e)}")
-            raise
-    
     def get_drug_trace(self, trace_hash: str) -> Optional[Dict[str, Any]]:
         """Get drug trace from blockchain"""
         try:
@@ -133,27 +213,4 @@ class BlockchainService:
             
         except Exception as e:
             logger.error(f"Failed to get drug trace: {str(e)}")
-            raise
-    
-    def verify_drug_trace(self, trace_hash: str, drug_data: Dict[str, Any]) -> bool:
-        """Verify drug trace data against blockchain"""
-        try:
-            # Get stored data
-            stored_data = self.get_drug_trace(trace_hash)
-            if not stored_data:
-                return False
-            
-            # Compare data hashes
-            current_hash = hashlib.sha256(
-                json.dumps(drug_data, sort_keys=True).encode()
-            ).hexdigest()
-            
-            stored_hash = hashlib.sha256(
-                json.dumps(stored_data, sort_keys=True).encode()
-            ).hexdigest()
-            
-            return current_hash == stored_hash
-            
-        except Exception as e:
-            logger.error(f"Failed to verify drug trace: {str(e)}")
-            return False 
+            raise 

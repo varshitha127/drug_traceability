@@ -52,25 +52,9 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', '')
 
-# Logging Configuration
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'file': {
-            'level': 'ERROR',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs/django.log'),
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['file'],
-            'level': 'ERROR',
-            'propagate': True,
-        },
-    },
-}
+# Update logging for production
+LOGGING['handlers']['file']['level'] = 'ERROR'
+LOGGING['loggers']['django']['level'] = 'ERROR'
 
 # Cache settings
 CACHES = {
@@ -85,4 +69,8 @@ MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Add security middleware
-MIDDLEWARE.insert(0, 'django.middleware.security.SecurityMiddleware') 
+MIDDLEWARE.insert(0, 'django.middleware.security.SecurityMiddleware')
+
+# Only initialize when needed (good)
+def get_blockchain_service():
+    return BlockchainService() 

@@ -19,10 +19,10 @@
                             <p class="text-muted mb-0">Product Details and Blockchain Information</p>
                         </div>
                         <div class="btn-group">
-                            <a href="{% url 'UpdateTracing' product.id %}" class="btn btn-outline-primary">
+                            <a href="{% url 'drugtrace:UpdateTracing' product.id %}" class="btn btn-outline-primary">
                                 <i class="fas fa-edit me-2"></i>Edit
                             </a>
-                            <a href="{% url 'ViewTracing' %}" class="btn btn-outline-secondary">
+                            <a href="{% url 'drugtrace:drug_list' %}" class="btn btn-outline-secondary">
                                 <i class="fas fa-arrow-left me-2"></i>Back
                             </a>
                         </div>

@@ -19,6 +19,7 @@ urlpatterns = [
     path('drugs/<uuid:drug_id>/update/', views.update_tracing, name='update_tracing'),
     path('drugs/<uuid:drug_id>/', views.view_tracing, name='view_tracing'),
     path('drugs/search/', views.search_drugs, name='search_drugs'),
+    path('drugs/', views.drug_list, name='drug_list'),
     
     # API endpoints
     path('api/drugs/<uuid:drug_id>/', views.api_drug_details, name='api_drug_details'),

@@ -6,11 +6,8 @@ from django.http import HttpResponse, JsonResponse
 from django.core.files.storage import FileSystemStorage
 import os
 from datetime import date
-import os
 import json
 from web3 import Web3, HTTPProvider
-import os
-from django.core.files.storage import FileSystemStorage
 import pickle
 import logging
 from typing import Dict, Any
@@ -25,75 +22,52 @@ from .services.auth import AuthService
 from .services.blockchain import BlockchainService
 from .forms import DrugForm, DrugTraceForm
 
-global details, username
-details=''
-global contract, product_name
-
 logger = logging.getLogger(__name__)
 
-# Initialize services
-auth_service = AuthService()
-blockchain_service = BlockchainService()
+# Remove global service initialization
+# Instead, create service instances when needed
+def get_auth_service():
+    return AuthService()
+
+def get_blockchain_service():
+    return BlockchainService()
+
+# Remove global variables
+# details = ''
+# username = ''
+# contract = None
+# product_name = None
 
 def readDetails(contract_type):
-    global details
-    details = ""
-    print(contract_type+"======================")
-    blockchain_address = 'http://127.0.0.1:9545' #Blokchain connection IP
-    web3 = Web3(HTTPProvider(blockchain_address))
-    web3.eth.defaultAccount = web3.eth.accounts[0]
-    compiled_contract_path = 'Drug.json' #Drug contract code
-    deployed_contract_address = '0x152C98B8d6B3b6B983ba6bE52A1b0AcEf132e86D' #hash address to access Drug contract
-    with open(compiled_contract_path) as file:
-        contract_json = json.load(file)  # load contract info as JSON
-        contract_abi = contract_json['abi']  # fetch contract's abi - necessary to call its functions
-    file.close()
-    contract = web3.eth.contract(address=deployed_contract_address, abi=contract_abi) #now calling contract to access data
-    if contract_type == 'signup':
-        details = contract.functions.getUser().call()
-    if contract_type == 'addproduct':
-        details = contract.functions.getTracingData().call()    
-    print(details)    
+    try:
+        blockchain_service = get_blockchain_service()
+        if contract_type == 'signup':
+            return blockchain_service.get_user_data()
+        if contract_type == 'addproduct':
+            return blockchain_service.get_tracing_data()
+    except Exception as e:
+        logger.error(f"Error reading blockchain details: {str(e)}")
+        return None
 
 def saveDataBlockChain(currentData, contract_type):
-    global details
-    global contract
-    details = ""
-    blockchain_address = 'http://127.0.0.1:9545'
-    web3 = Web3(HTTPProvider(blockchain_address))
-    web3.eth.defaultAccount = web3.eth.accounts[0]
-    compiled_contract_path = 'Drug.json' #Drug contract file
-    deployed_contract_address = '0x152C98B8d6B3b6B983ba6bE52A1b0AcEf132e86D' #contract address
-    with open(compiled_contract_path) as file:
-        contract_json = json.load(file)  # load contract info as JSON
-        contract_abi = contract_json['abi']  # fetch contract's abi - necessary to call its functions
-    file.close()
-    contract = web3.eth.contract(address=deployed_contract_address, abi=contract_abi)
-    readDetails(contract_type)
-    if contract_type == 'signup':
-        details+=currentData
-        msg = contract.functions.addUser(details).transact()
-        tx_receipt = web3.eth.waitForTransactionReceipt(msg)
-    if contract_type == 'addproduct':
-        details+=currentData
-        msg = contract.functions.setTracingData(details).transact()
-        tx_receipt = web3.eth.waitForTransactionReceipt(msg)
-    
+    try:
+        blockchain_service = get_blockchain_service()
+        if contract_type == 'signup':
+            return blockchain_service.add_user_data(currentData)
+        if contract_type == 'addproduct':
+            return blockchain_service.add_tracing_data(currentData)
+    except Exception as e:
+        logger.error(f"Error saving to blockchain: {str(e)}")
+        raise
 
 def updateQuantityBlock(currentData):
-    blockchain_address = 'http://127.0.0.1:9545'
-    web3 = Web3(HTTPProvider(blockchain_address))
-    web3.eth.defaultAccount = web3.eth.accounts[0]
-    compiled_contract_path = 'Drug.json' #student contract file
-    deployed_contract_address = '0x152C98B8d6B3b6B983ba6bE52A1b0AcEf132e86D' #contract address
-    with open(compiled_contract_path) as file:
-        contract_json = json.load(file)  # load contract info as JSON
-        contract_abi = contract_json['abi']  # fetch contract's abi - necessary to call its functions
-    file.close()
-    contract = web3.eth.contract(address=deployed_contract_address, abi=contract_abi)
-    msg = contract.functions.setTracingData(currentData).transact()
-    tx_receipt = web3.eth.waitForTransactionReceipt(msg)
-    
+    try:
+        blockchain_service = get_blockchain_service()
+        return blockchain_service.update_tracing_data(currentData)
+    except Exception as e:
+        logger.error(f"Error updating quantity: {str(e)}")
+        raise
+
 def index(request):
     """Home page view"""
     return render(request, 'index.html')
@@ -106,7 +80,7 @@ def login_view(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
         
-        success, message, user = auth_service.login_user(request, username, password)
+        success, message, user = get_auth_service().login_user(request, username, password)
         
         if success:
             messages.success(request, message)
@@ -131,7 +105,7 @@ def register_view(request):
         role = request.POST.get('role', 'consumer')
         blockchain_address = request.POST.get('blockchain_address')
         
-        success, message, user = auth_service.register_user(
+        success, message, user = get_auth_service().register_user(
             username=username,
             email=email,
             password=password,
@@ -152,7 +126,7 @@ def register_view(request):
 @login_required
 def logout_view(request):
     """Logout view"""
-    auth_service.logout_user(request)
+    get_auth_service().logout_user(request)
     messages.success(request, "Logged out successfully")
     return redirect('index')
 
@@ -225,7 +199,7 @@ def add_product(request):
                     'status': drug.status
                 }
                 
-                tx_hash = blockchain_service.add_drug_trace(drug_data)
+                tx_hash = get_blockchain_service().add_drug_trace(drug_data)
                 drug.blockchain_hash = tx_hash
                 drug.save()
                 
@@ -286,7 +260,7 @@ def update_tracing(request, drug_id):
                         'notes': trace.notes
                     }
                     
-                    tx_hash = blockchain_service.add_drug_trace(trace_data)
+                    tx_hash = get_blockchain_service().add_drug_trace(trace_data)
                     trace.blockchain_hash = tx_hash
                     trace.save()
                     
@@ -320,7 +294,7 @@ def view_tracing(request, drug_id):
         traces = drug.traces.all().order_by('-created_at')
         
         # Verify blockchain data
-        is_verified = blockchain_service.verify_drug_trace(
+        is_verified = get_blockchain_service().verify_drug_trace(
             drug.blockchain_hash,
             {
                 'name': drug.name,
@@ -445,7 +419,6 @@ def AddProduct(request):
 
 def UpdateTracingAction(request):
     if request.method == 'GET':
-        global product_name
         product_name = request.GET['pname']
         output = '<tr><td><font size="" color="black">Product&nbsp;Name</font></td>'
         output += '<td><input type="text" name="t1" style="font-family: Comic Sans MS" size="30" value='+product_name+' readonly/></td></tr>'
@@ -463,7 +436,7 @@ def UpdateTracing(request):
         output+='<th><font size=3 color=black>Last Update Date</font></th>'
         output+='<th><font size=3 color=black>Current Tracing Info</font></th>'
         output+='<th><font size=3 color=black>Update New Tracing Info</font></th></tr>'
-        readDetails("addproduct")
+        details = readDetails("addproduct")
         rows = details.split("\n")
         for i in range(len(rows)-1):
             arr = rows[i].split("#")
@@ -488,7 +461,7 @@ def AddTracingAction(request):
         tracing_status = request.POST.get('t3', False)
         index = 0
         record = ''
-        readDetails("addproduct")
+        details = readDetails("addproduct")
         rows = details.split("\n")
         tot_qty = 0
         for i in range(len(rows)-1):
@@ -508,138 +481,208 @@ def AddTracingAction(request):
           
 def AddProductAction(request):
     if request.method == 'POST':
-        cname = request.POST.get('t1', False)
-        qty = request.POST.get('t2', False)
-        price = request.POST.get('t3', False)
-        desc = request.POST.get('t4', False)
-        image = request.FILES['t5']
-        imagename = request.FILES['t5'].name
+        try:
+            drug_name = request.POST.get('t1', '')
+            quantity = request.POST.get('t2', '')
+            price = request.POST.get('t3', '')
+            description = request.POST.get('t4', '')
+            image = request.FILES.get('t5')
+            
+            if not all([drug_name, quantity, price, description, image]):
+                messages.error(request, "All fields are required")
+                return render(request, 'AddProduct.html', {})
 
-        today = date.today()
-        fs = FileSystemStorage()
-        filename = fs.save('DrugTraceApp/static/products/'+imagename, image)
-        
-        data = "addproduct#"+cname+"#"+price+"#"+qty+"#"+desc+"#"+imagename+"#"+str(today)+"#Production State\n"
-        saveDataBlockChain(data,"addproduct")
-        context= {'data':"Product details saved in Blockchain"}
-        return render(request, 'AddProduct.html', context)
-        
-   
+            # Save image
+            fs = FileSystemStorage()
+            imagename = image.name
+            filename = fs.save('DrugTraceApp/static/products/'+imagename, image)
+            
+            # Prepare data for blockchain
+            drug_data = {
+                'name': drug_name,
+                'price': price,
+                'quantity': quantity,
+                'description': description,
+                'image': imagename,
+                'date': str(date.today()),
+                'status': 'Production State'
+            }
+            
+            # Save to blockchain
+            tx_hash = get_blockchain_service().add_drug_trace(drug_data)
+            
+            messages.success(request, "Product details saved in Blockchain successfully!")
+            return render(request, 'AddProduct.html', {})
+            
+        except Exception as e:
+            logger.error(f"Error adding product: {str(e)}")
+            messages.error(request, f"Failed to add product: {str(e)}")
+            return render(request, 'AddProduct.html', {})
+
 def Signup(request):
     if request.method == 'POST':
-        username = request.POST.get('username', '')
-        password = request.POST.get('password', '')
-        contact = request.POST.get('contact', '')
-        email = request.POST.get('email', '')
-        address = request.POST.get('address', '')
-        record = 'none'
-        readDetails("signup")
-        rows = details.split("\n")
-        for i in range(len(rows)-1):
-            arr = rows[i].split("#")
-            if arr[0] == "signup":
-                if arr[1] == username:
-                    record = "exists"
-                    break
-        if record == 'none':
-            data = "signup#"+username+"#"+password+"#"+contact+"#"+email+"#"+address+"\n"
-            saveDataBlockChain(data,"signup")
+        try:
+            username = request.POST.get('username', '')
+            password = request.POST.get('password', '')
+            contact = request.POST.get('contact', '')
+            email = request.POST.get('email', '')
+            address = request.POST.get('address', '')
+            
+            if not all([username, password, contact, email, address]):
+                messages.error(request, "All fields are required")
+                return render(request, 'Register.html', {})
+            
+            # Check if username exists
+            user_data = get_blockchain_service().get_user_data()
+            if user_data and username in user_data:
+                messages.error(request, f"Username '{username}' already exists")
+                return render(request, 'Register.html', {})
+            
+            # Prepare user data
+            user_data = {
+                'username': username,
+                'password': password,
+                'contact': contact,
+                'email': email,
+                'address': address
+            }
+            
+            # Save to blockchain
+            tx_hash = get_blockchain_service().add_user_data(json.dumps(user_data))
+            
             messages.success(request, "Signup process completed and record saved in Blockchain")
             return render(request, 'Register.html', {})
-        else:
-            messages.error(request, f"Username '{username}' already exists")
-            return render(request, 'Register.html', {})    
-
-
+            
+        except Exception as e:
+            logger.error(f"Error during signup: {str(e)}")
+            messages.error(request, f"Signup failed: {str(e)}")
+            return render(request, 'Register.html', {})
 
 def UserLogin(request):
     if request.method == 'POST':
-        username = request.POST.get('username', False)
-        password = request.POST.get('password', False)
-        status = "Login.html"
-        context= {'data':'Invalid login details'}
-        if username == 'admin' and password == 'admin':
-            context = {'data':"Welcome "+username}
-            status = "AdminScreen.html"
-        else:
-            readDetails("signup")
-            rows = details.split("\n")
-            for i in range(len(rows)-1):
-                arr = rows[i].split("#")
-                if arr[0] == "signup":
-                    if arr[1] == username and arr[2] == password:
-                        context = {'data':"Welcome "+username}
-                        status = 'UserScreen.html'
-                        file = open('session.txt','w')
-                        file.write(username)
-                        file.close()
-                        break
-        return render(request, status, context)              
-
+        try:
+            username = request.POST.get('username', '')
+            password = request.POST.get('password', '')
+            
+            if not username or not password:
+                messages.error(request, "Username and password are required")
+                return render(request, 'Login.html', {})
+            
+            # Admin login
+            if username == 'admin' and password == 'admin':
+                messages.success(request, f"Welcome {username}")
+                return render(request, 'AdminScreen.html', {})
+            
+            # Regular user login
+            user_data = get_blockchain_service().get_user_data()
+            if user_data:
+                users = user_data.split('\n')
+                for user in users:
+                    if user.startswith('signup#'):
+                        fields = user.split('#')
+                        if len(fields) >= 3 and fields[1] == username and fields[2] == password:
+                            messages.success(request, f"Welcome {username}")
+                            # Store session
+                            with open('session.txt', 'w') as file:
+                                file.write(username)
+                            return render(request, 'UserScreen.html', {})
+            
+            messages.error(request, "Invalid login details")
+            return render(request, 'Login.html', {})
+            
+        except Exception as e:
+            logger.error(f"Login error: {str(e)}")
+            messages.error(request, "Login failed. Please try again.")
+            return render(request, 'Login.html', {})
 
 def ViewTracing(request):
     if request.method == 'GET':
-        output = '<table class="table table-hover align-middle">'
-        output += '<thead><tr>'
-        output += '<th>Drug Name</th>'
-        output += '<th>Manufacturer</th>'
-        output += '<th>Batch Number</th>'
-        output += '<th>Manufacturing Date</th>'
-        output += '<th>Expiry Date</th>'
-        output += '<th>Quantity</th>'
-        output += '<th>Description</th>'
-        output += '<th>Image</th>'
-        output += '<th>Last Updated</th>'
-        output += '<th>Status</th>'
-        output += '</tr></thead><tbody>'
-        
-        readDetails("addproduct")
-        rows = details.split("\n")
-        for i in range(len(rows)-1):
-            arr = rows[i].split("#")
-            if arr[0] == 'addproduct':
-                output += '<tr>'
-                output += f'<td>{arr[1]}</td>'  # Drug Name
-                output += f'<td>{arr[2]}</td>'  # Manufacturer
-                output += f'<td>{arr[3]}</td>'  # Batch Number
-                output += f'<td>{arr[4]}</td>'  # Manufacturing Date
-                output += f'<td>{arr[5]}</td>'  # Expiry Date
-                output += f'<td>{arr[6]}</td>'  # Quantity
-                output += f'<td>{arr[7]}</td>'  # Description
-                output += f'<td><img src="/static/products/{arr[8]}" width="100" height="100" class="img-thumbnail"></td>'  # Image
-                output += f'<td>{arr[9]}</td>'  # Last Updated
-                output += f'<td><span class="badge bg-success">{arr[10]}</span></td>'  # Status
-                output += '</tr>'
-        
-        output += '</tbody></table>'
-        context = {'data': output}
-        return render(request, 'ViewTracing.html', context)   
-        
+        try:
+            tracing_data = get_blockchain_service().get_tracing_data()
+            if not tracing_data:
+                messages.warning(request, "No tracing data available")
+                return render(request, 'ViewTracing.html', {'data': ''})
+            
+            output = '<table class="table table-hover align-middle">'
+            output += '<thead><tr>'
+            output += '<th>Drug Name</th>'
+            output += '<th>Manufacturer</th>'
+            output += '<th>Batch Number</th>'
+            output += '<th>Manufacturing Date</th>'
+            output += '<th>Expiry Date</th>'
+            output += '<th>Quantity</th>'
+            output += '<th>Description</th>'
+            output += '<th>Image</th>'
+            output += '<th>Last Updated</th>'
+            output += '<th>Status</th>'
+            output += '</tr></thead><tbody>'
+            
+            rows = tracing_data.split("\n")
+            for row in rows:
+                if row.startswith('addproduct#'):
+                    fields = row.split('#')
+                    if len(fields) >= 11:
+                        output += '<tr>'
+                        output += f'<td>{fields[1]}</td>'  # Drug Name
+                        output += f'<td>{fields[2]}</td>'  # Manufacturer
+                        output += f'<td>{fields[3]}</td>'  # Batch Number
+                        output += f'<td>{fields[4]}</td>'  # Manufacturing Date
+                        output += f'<td>{fields[5]}</td>'  # Expiry Date
+                        output += f'<td>{fields[6]}</td>'  # Quantity
+                        output += f'<td>{fields[7]}</td>'  # Description
+                        output += f'<td><img src="/static/products/{fields[8]}" width="100" height="100" class="img-thumbnail"></td>'  # Image
+                        output += f'<td>{fields[9]}</td>'  # Last Updated
+                        output += f'<td><span class="badge bg-success">{fields[10]}</span></td>'  # Status
+                        output += '</tr>'
+            
+            output += '</tbody></table>'
+            return render(request, 'ViewTracing.html', {'data': output})
+            
+        except Exception as e:
+            logger.error(f"Error viewing tracing: {str(e)}")
+            messages.error(request, "Failed to load tracing data")
+            return render(request, 'ViewTracing.html', {'data': ''})
+
 def ViewUsers(request):
     if request.method == 'GET':
-        output = '<table class="table table-hover align-middle">'
-        output += '<thead><tr>'
-        output += '<th>Username</th>'
-        output += '<th>Email</th>'
-        output += '<th>Contact</th>'
-        output += '<th>Address</th>'
-        output += '<th>Status</th>'
-        output += '</tr></thead><tbody>'
-        
-        readDetails("signup")
-        rows = details.split("\n")
-        for i in range(len(rows)-1):
-            arr = rows[i].split("#")
-            if arr[0] == "signup":
-                output += '<tr>'
-                output += f'<td>{arr[1]}</td>'  # Username
-                output += f'<td>{arr[4]}</td>'  # Email
-                output += f'<td>{arr[3]}</td>'  # Contact
-                output += f'<td>{arr[5]}</td>'  # Address
-                output += '<td><span class="badge bg-success">Active</span></td>'
-                output += '</tr>'
-        
-        output += '</tbody></table>'
-        context = {'data': output}
-        return render(request, 'ViewUsers.html', context)
+        try:
+            user_data = get_blockchain_service().get_user_data()
+            if not user_data:
+                messages.warning(request, "No user data available")
+                return render(request, 'ViewUsers.html', {'data': ''})
+            
+            output = '<table class="table table-hover align-middle">'
+            output += '<thead><tr>'
+            output += '<th>Username</th>'
+            output += '<th>Email</th>'
+            output += '<th>Contact</th>'
+            output += '<th>Address</th>'
+            output += '<th>Status</th>'
+            output += '</tr></thead><tbody>'
+            
+            rows = user_data.split("\n")
+            for row in rows:
+                if row.startswith('signup#'):
+                    fields = row.split('#')
+                    if len(fields) >= 6:
+                        output += '<tr>'
+                        output += f'<td>{fields[1]}</td>'  # Username
+                        output += f'<td>{fields[4]}</td>'  # Email
+                        output += f'<td>{fields[3]}</td>'  # Contact
+                        output += f'<td>{fields[5]}</td>'  # Address
+                        output += '<td><span class="badge bg-success">Active</span></td>'
+                        output += '</tr>'
+            
+            output += '</tbody></table>'
+            return render(request, 'ViewUsers.html', {'data': output})
+            
+        except Exception as e:
+            logger.error(f"Error viewing users: {str(e)}")
+            messages.error(request, "Failed to load user data")
+            return render(request, 'ViewUsers.html', {'data': ''})
+
+@login_required
+def drug_list(request):
+    drugs = Drug.objects.all().order_by('-created_at')
+    return render(request, 'ViewTracing.html', {'drugs': drugs})
             

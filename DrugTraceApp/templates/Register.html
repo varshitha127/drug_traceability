@@ -25,7 +25,7 @@
                         {% endfor %}
                     {% endif %}
 
-                    <form method="POST" action="{% url 'Signup' %}" class="needs-validation" novalidate>
+                    <form method="POST" action="{% url 'drugtrace:register' %}" class="needs-validation" novalidate>
                         {% csrf_token %}
                         <div class="mb-3">
                             <label for="username" class="form-label">Username</label>
@@ -120,7 +120,7 @@
                             <button type="submit" class="btn btn-primary btn-lg">
                                 <i class="fas fa-user-plus me-2"></i>Create Account
                             </button>
-                            <a href="{% url 'Login' %}" class="btn btn-outline-secondary btn-lg">
+                            <a href="{% url 'drugtrace:login' %}" class="btn btn-outline-secondary btn-lg">
                                 <i class="fas fa-sign-in-alt me-2"></i>Already have an account? Login
                             </a>
                         </div>
