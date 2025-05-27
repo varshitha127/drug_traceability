@@ -19,4 +19,12 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: WEB_CONCURRENCY
-        value: 4 
+        value: 4
+      - key: BLOCKCHAIN_ADDRESS
+        value: https://sepolia.infura.io/v3/your-infura-key
+      - key: CONTRACT_PATH
+        value: Drug.json
+      - key: CONTRACT_ADDRESS
+        value: 0x152C98B8d6B3b6B983ba6bE52A1b0AcEf132e86D
+      - key: BLOCKCHAIN_PRIVATE_KEY
+        sync: false  # This will need to be set manually in Render dashboard 
