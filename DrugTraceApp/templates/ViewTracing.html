@@ -16,7 +16,7 @@
                     </h2>
                     <p class="text-muted">Track and manage your drug inventory</p>
                 </div>
-                <a href="{% url 'AddProduct' %}" class="btn btn-primary">
+                <a href="{% url 'drugtrace:add_product' %}" class="btn btn-primary">
                     <i class="fas fa-plus me-2"></i>Add New Product
                 </a>
             </div>
@@ -42,7 +42,7 @@
                     <div class="text-center py-4">
                         <i class="fas fa-pills fa-3x text-muted mb-3"></i>
                         <p class="text-muted">No products found in the system</p>
-                        <a href="{% url 'AddProduct' %}" class="btn btn-primary">
+                        <a href="{% url 'drugtrace:add_product' %}" class="btn btn-primary">
                             <i class="fas fa-plus me-2"></i>Add Your First Product
                         </a>
                     </div>

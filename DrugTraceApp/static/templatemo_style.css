@@ -182,7 +182,7 @@ img {
 #content_right .right_column_section {
 	clear: both;
 	position: relative;
-	background: url(images/templatemo_section_01_content_bg.jpg) repeat-y;
+	background: url(images/templatemo_section_01_content_bg.jpg) repeat-y;	
 	background-size: 270px auto;
 }
 
@@ -225,7 +225,7 @@ img {
 	width: 600px;
 	height: 210px;
 	padding: 0px 400px 30px 40px;
-	background: url(images/templatemo_bottom_panel_bg.jpg) no-repeat;
+	background: url(images/templatemo_bottom_panel_bg.jpg) no-repeat;	
 	background-size: 600px 210px;
 }
 

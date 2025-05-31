@@ -30,9 +30,9 @@ function validate(){
 	</div>
 	<div id="menu">
 		<ul><center>
-      <li><a href="{% url 'drugtrace:AddProduct' %}">Add New Drug</a></li>
-	  <li><a href="{% url 'drugtrace:UpdateTracing' %}">Update Tracing Details</a></li>
-	  <li><a href="{% url 'drugtrace:index' %}">Logout</a></li>		
+      <li><a href="{% url 'drugtrace:add_product' %}">Add New Drug</a></li>
+	  <li><a href="{% url 'drugtrace:update_tracing' %}">Update Tracing Details</a></li>
+	  <li><a href="{% url 'drugtrace:logout' %}">Logout</a></li>		
 		</center></ul>
 <br class="clearfix" />
 				</div>
@@ -41,7 +41,7 @@ function validate(){
 		<img class="pic" src="{% static 'images/investor.jpg' %}" width="870" height="230" alt="" />
 	</div>	
 			<center>
-<form name="f1" method="post" action={% url 'drugtrace:AddTracingAction' %} OnSubmit="return validate()">
+<form name="f1" method="post" action="{% url 'drugtrace:update_tracing' %}" OnSubmit="return validate()">
 	{% csrf_token %}<br/>
    <h3><b>Add Drug Tracing Details Screen</b></h3>
    

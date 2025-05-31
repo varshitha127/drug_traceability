@@ -25,7 +25,7 @@
                         {% endfor %}
                     {% endif %}
 
-                    <form method="POST" action="{% url 'AddProduct' %}" enctype="multipart/form-data" class="needs-validation" novalidate>
+                    <form method="POST" action="{% url 'drugtrace:add_product' %}" enctype="multipart/form-data" class="needs-validation" novalidate>
                         {% csrf_token %}
                         <div class="row">
                             <div class="col-md-6 mb-3">

@@ -32,7 +32,7 @@
                         </div>
                     {% endif %}
 
-                    <form method="POST" action="{% url 'UserLogin' %}" class="needs-validation" novalidate>
+                    <form method="POST" action="{% url 'drugtrace:login' %}" class="needs-validation" novalidate>
                         {% csrf_token %}
                         <div class="mb-3">
                             <label for="username" class="form-label">Username</label>
