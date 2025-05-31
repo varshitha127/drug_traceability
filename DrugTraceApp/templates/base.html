@@ -8,8 +8,22 @@
     <title>{% block title %}Drug Traceability System{% endblock %}</title>
     
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
-    <link rel="shortcut icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
+    <link rel="icon" id="dynamicFavicon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💊</text></svg>">
+    <!-- Alternative icons you can use by changing the emoji above:
+         🔗 (chain link) - fa-link
+         🛡️ (shield) - fa-shield-alt
+         ✅ (check) - fa-check-circle
+         📱 (qr code) - fa-qrcode
+    -->
+    
+    <!-- Favicon Switcher Button (for testing) -->
+    <button class="btn btn-sm btn-outline-primary position-fixed" 
+            style="bottom: 70px; right: 20px; z-index: 1000;"
+            onclick="cycleFavicon()" 
+            data-bs-toggle="tooltip" 
+            title="Change Favicon">
+        <i class="fas fa-icons"></i> Change Icon
+    </button>
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -665,6 +679,27 @@
                 link.classList.add('active');
             }
         });
+
+        // Favicon Switcher
+        const favicons = ['💊', '🔗', '🛡️', '✅', '📱'];
+        let currentFaviconIndex = 0;
+
+        function cycleFavicon() {
+            currentFaviconIndex = (currentFaviconIndex + 1) % favicons.length;
+            const favicon = document.getElementById('dynamicFavicon');
+            const newIcon = favicons[currentFaviconIndex];
+            favicon.href = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>${newIcon}</text></svg>`;
+            
+            // Show toast notification
+            const iconNames = {
+                '💊': 'Pill (Drug)',
+                '🔗': 'Chain Link (Blockchain)',
+                '🛡️': 'Shield (Security)',
+                '✅': 'Check (Verification)',
+                '📱': 'QR Code (Tracking)'
+            };
+            showToast(`Changed favicon to ${iconNames[newIcon]}`, 'info');
+        }
     </script>
     {% block extra_js %}{% endblock %}
 </body>
