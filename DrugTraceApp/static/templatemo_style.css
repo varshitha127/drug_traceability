@@ -9,7 +9,7 @@ body {
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 15px;
 	color:black;
-	background: #afa87d;
+	background: url(images/img03.jpg) no-repeat;
 }
 
 a:link, a:visited { color: #d46528; text-decoration: none; font-weight: bold; } 
