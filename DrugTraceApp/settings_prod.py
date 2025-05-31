@@ -9,7 +9,7 @@ DEBUG = False
 SECRET_KEY = '23cCGBknmI36jcex1qLoRS4VxCEtAozMjHOFtWIMZyg='
 
 # Update ALLOWED_HOSTS with your domain
-ALLOWED_HOSTS = ['22e47c6b1e833b107be7ed471463aaf4', 'www.22e47c6b1e833b107be7ed471463aaf4']
+ALLOWED_HOSTS = ['drugtrace.onrender.com', 'www.drugtrace.onrender.com', '22e47c6b1e833b107be7ed471463aaf4', 'www.22e47c6b1e833b107be7ed471463aaf4']
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
