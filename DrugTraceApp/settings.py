@@ -111,12 +111,10 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # This production code might break development mode, so we check whether we're in DEBUG mode
 if not DEBUG:
-    # Tell Django to copy static assets into a path called `staticfiles` (this is specific to Render)
-    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
     # Enable the WhiteNoise storage backend, which compresses static files to reduce disk use
     # and renames the files with unique names for each version to support long-term caching
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
@@ -130,7 +128,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Blockchain Configuration
 BLOCKCHAIN_ADDRESS = os.getenv('BLOCKCHAIN_ADDRESS', 'http://127.0.0.1:9545')
-CONTRACT_PATH = os.getenv('CONTRACT_PATH', 'Drug.json')
+CONTRACT_PATH = os.path.join(BASE_DIR, 'Drug.json')
 CONTRACT_ADDRESS = os.getenv('CONTRACT_ADDRESS', '0x152C98B8d6B3b6B983ba6bE52A1b0AcEf132e86D')
 BLOCKCHAIN_PRIVATE_KEY = os.getenv('BLOCKCHAIN_PRIVATE_KEY')
 
