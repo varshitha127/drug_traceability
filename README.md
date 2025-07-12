@@ -15,6 +15,12 @@ A blockchain-based solution for tracking and tracing pharmaceutical products thr
 - **Authentication**: Secure login system for all stakeholders
 - **Real-time Updates**: Instant blockchain updates for drug status changes
 
+## Demo Screenshots:
+<img width="1899" height="962" alt="Screenshot 2025-07-12 165014" src="https://github.com/user-attachments/assets/814daeee-4be6-4e59-9180-1867d84ade2a" />
+<img width="1916" height="890" alt="Screenshot 2025-07-12 165036" src="https://github.com/user-attachments/assets/d8af9e3c-3c46-4300-a34e-6d810e0c0089" />
+<img width="1882" height="880" alt="Screenshot 2025-07-12 165150" src="https://github.com/user-attachments/assets/0f605acb-d13b-4ff8-ae4c-5f8680ca5758" />
+<img width="1906" height="882" alt="Screenshot 2025-07-12 165220" src="https://github.com/user-attachments/assets/900f5010-9cd9-4354-b371-46a96ac99527" />
+
 ## Technology Stack
 
 - **Backend**: Django (Python)
